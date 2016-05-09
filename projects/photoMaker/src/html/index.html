@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,  minimal-ui, user-scalable=no"/>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="format-detection" content="telephone=no, email=no" />
+
+    <title>照片DIY</title>
+  <link rel="stylesheet" href="../css/style-index.css" media="screen" title="no title" charset="utf-8">
+
+	<script src="../js/libs/lrz4/lrz.bundle.js"></script>
+	<script src="../js/libs/jquery-2.1.4.min.js"></script>
+	<script src="../js/libs/pixi.js"></script>
+  <script src="../js/libs/hammer.min.js" charset="utf-8"></script>
+  <!-- <script src="../js/libs/hammer_pixi.js" charset="utf-8"></script> -->
+  <script src="../js/main.js" charset="utf-8"></script>
+</head>
+
+<body>
+    <div id="outImg"><img src="" alt="" /></div>
+    <div id="canvas"></div>
+    <div id="upload_btn">
+      <input type="file" capture="camera" accept="image/*" name="logo" id="file">
+      <img src="../img/upload_tip.png" alt="">
+    </div>
+	<script>
+  $(document).ready(function() {
+    initMain();
+  });
+	</script>
+</body>
