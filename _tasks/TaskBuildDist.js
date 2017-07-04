@@ -14,6 +14,8 @@ var imagemin = require('gulp-imagemin');
 var pngquant = require('imagemin-pngquant');
 var tmtsprite = require('gulp-tmtsprite');   // 雪碧图合并
 var ejshelper = require('tmt-ejs-helper');
+var tmodjs = require('gulp-tmod');
+var inject = require('gulp-inject');         // art-template 预编译
 var postcss = require('gulp-postcss');  // CSS 预处理
 var postcssPxtorem = require('postcss-pxtorem'); // 转换 px 为 rem
 var postcssAutoprefixer = require('autoprefixer');
@@ -32,15 +34,18 @@ var paths = {
         media: './src/media/**/*',
         less: './src/css/style-*.less',
         lessAll: './src/css/**/*.less',
+        template: './src/template/**/*.html',
         html: ['./src/html/**/*.html', '!./src/html/_*/**.html'],
         htmlAll: './src/html/**/*',
-        php: './src/**/*.php'
+        php: './src/**/*.php',
+        index: './src/*.html'
     },
     tmp: {
         dir: './tmp',
         css: './tmp/css',
         img: './tmp/img',
         html: './tmp/html',
+        js: './tmp/js',
         sprite: './tmp/sprite'
     },
     dist: {
@@ -48,7 +53,8 @@ var paths = {
         css: './dist/css',
         img: './dist/img',
         html: './dist/html',
-        sprite: './dist/sprite'
+        sprite: './dist/sprite',
+        template: './dist/js'
     }
 };
 
@@ -56,17 +62,14 @@ module.exports = function (gulp, config) {
     var webp = require('./common/webp')(config);
 
     var lazyDir = config.lazyDir || ['../slice'];
+    var remConfig = config.remConfig || {rootValue: 75,unitPrecision: 10, minPixelValue: 2};
 
     var postcssOption = [];
 
     if (config.supportREM) {
         postcssOption = [
             postcssAutoprefixer({browsers: ['last 5 versions']}),
-            postcssPxtorem({
-                root_value: '20', // 基准值 html{ font-zise: 20px; }
-                prop_white_list: [], // 对所有 px 值生效
-                minPixelValue: 2 // 忽略 1px 值
-            })
+            postcssPxtorem(remConfig)
         ]
     } else {
         postcssOption = [
@@ -82,6 +85,11 @@ module.exports = function (gulp, config) {
     // 清除 tmp 目录
     function delTmp() {
         return del([paths.tmp.dir]);
+    }
+
+    // 清除 JS 合并产生后原始文件
+    function delTmpJS(){
+        return del(['./dist/js/**/*', '!./dist/js/template.js', '!./dist/js/main.js', '!./dist/js/libs.js', '!./dist/js/template.*.js', '!./dist/js/main.*.js', '!./dist/js/libs.*.js'])
     }
 
     //编译 less
@@ -127,6 +135,10 @@ module.exports = function (gulp, config) {
         return gulp.src(paths.src.media, {base: paths.src.dir}).pipe(gulp.dest(paths.dist.dir));
     }
 
+    function copyIndex() {
+        return gulp.src(paths.src.index, {base: paths.src.dir}).pipe(gulp.dest(paths.dist.dir));
+    }
+
     //JS 压缩
     function uglifyJs() {
         return gulp.src(paths.src.js, {base: paths.src.dir})
@@ -143,17 +155,74 @@ module.exports = function (gulp, config) {
             .pipe(gulp.dest(paths.tmp.sprite));
     }
 
+    // 判断是否执行 art-template 模板预编译 white++
+    function supportTmod() {
+        if (config['tmod']) {
+            return gulp.series(
+                artTemplate
+            );
+        } else {
+            return function noTmod(cb) {
+                cb();
+            };
+        }
+    }
+
+    //art Template 预编译 white++
+    function artTemplate() {
+        // console.log("compileTemplate: "+config.tmod);
+        var temp_path = process.cwd() + '/src/template';
+        return gulp.src(paths.src.template)
+            .pipe(tmodjs({
+                output: false,
+                templateBase: temp_path
+            }))
+            .pipe(gulp.dest(paths.tmp.js))
+            .on('data', function () {
+            })
+            .on('end', function () {
+            });
+    }
+
+    //编译 根目录html
+    function compileRootHtml() {
+        // console.log(gulp.src('./dev/js/template.js'));
+        return gulp.src(paths.src.index)
+            .pipe(gulpif(
+                config.tmod,
+                inject(gulp.src('./js/template.js', {read: false,cwd: process.cwd() +'/tmp'}), {addRootSlash: false,addPrefix:'.', name: 'template'}))  //,cwd: process.cwd() +'/dev'
+            )
+            .pipe(ejs(ejshelper()).on('error', function (error) {
+                console.log(error.message);
+            }))
+            .pipe(gulpif(
+                config.supportREM,
+                posthtml(
+                    posthtmlPx2rem(remConfig)
+                ))
+            )
+            .pipe(usemin({  //JS 合并压缩
+                jsmin: uglify()
+            }))
+            .pipe(gulp.dest(paths.tmp.dir))
+            .on('data', function () {
+            })
+            .on('end', function () {
+            });
+    }
+
     //html 编译
     function compileHtml() {
         return gulp.src(paths.src.html)
+            .pipe(gulpif(
+                config.tmod,
+                inject(gulp.src('./js/template.js', {read: false,cwd: process.cwd() +'/tmp'}), {addRootSlash: false,addPrefix:'..', name: 'template'}))  //,cwd: process.cwd() +'/dev'
+            )
             .pipe(ejs(ejshelper()))
             .pipe(gulpif(
                 config.supportREM,
                 posthtml(
-                    posthtmlPx2rem({
-                        rootValue: 20,
-                        minPixelValue: 2
-                    })
+                    posthtmlPx2rem(remConfig)
                 ))
             )
             .pipe(usemin({  //JS 合并压缩
@@ -179,7 +248,6 @@ module.exports = function (gulp, config) {
             fileNameManifest: 'manifest.json',
             dontRenameFile: ['.html', '.php']
         });
-
         if (config['reversion']) {
             return gulp.src(['./tmp/**/*'])
                 .pipe(revAll.revision())
@@ -195,12 +263,12 @@ module.exports = function (gulp, config) {
     }
 
     function findChanged(cb) {
-
         if (!config['supportChanged']) {
             return gulp.src('./tmp/**/*', {base: paths.tmp.dir})
                 .pipe(gulp.dest(paths.dist.dir))
                 .on('end', function () {
                     delTmp();
+                    delTmpJS();
                 })
         } else {
             var diff = changed('./tmp');
@@ -243,6 +311,7 @@ module.exports = function (gulp, config) {
                     .pipe(gulp.dest(paths.dist.dir))
                     .on('end', function () {
                         delTmp();
+                        delTmpJS();
                     })
 
             } else {
@@ -270,14 +339,16 @@ module.exports = function (gulp, config) {
         gulp.parallel(
             imageminImg,
             imageminSprite,
+            copyIndex,
             copyMedia,
             uglifyJs
         ),
+        supportTmod(),
         compileHtml,
+        compileRootHtml,
         reversion,
         supportWebp(),
         findChanged,
         loadPlugin
     ));
 };
-

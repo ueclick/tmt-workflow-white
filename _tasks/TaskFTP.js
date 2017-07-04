@@ -2,6 +2,7 @@ var _ = require('lodash');
 var del = require('del');
 var path = require('path');
 var ftp = require('gulp-ftp');
+var sftp = require('gulp-sftp');
 var util = require('./lib/util');
 
 module.exports = function (gulp, config) {
@@ -19,7 +20,7 @@ module.exports = function (gulp, config) {
             distPath = config['ftp']['includeHtml'] ? './dist/**/*' : ['./dist/**/*', '!./dist/html/**/*.html'];
 
         return gulp.src(distPath, {base: '.'})
-            .pipe(ftp(ftpConfig));
+            .pipe(sftp(ftpConfig));
     }
 
     //加载插件

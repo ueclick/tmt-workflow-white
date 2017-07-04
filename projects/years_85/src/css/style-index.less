@@ -1,0 +1,215 @@
+@import "normalize";
+@import "orient";
+@import "fullpage";
+
+html,body { overflow: hidden; margin: 0; padding: 0; width: 100%; height: 100%; background: #FFF; }
+* {
+    /* mobile端点击按钮,屏蔽蓝色边框 */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-appearance: none;
+}
+
+#main {
+  // position: absolute;
+  // opacity: 0;
+  display: none;
+
+  width: 100%;
+  height:100%;
+}
+
+#menu {
+
+  width: 100%;
+  height: 100%;
+}
+
+#devicemotion {
+  float: left;
+  position: relative;
+  z-index: 9;
+}
+
+#video_2_1 {
+  // display: none;
+  // opacity: 0.5;
+  position: absolute;
+  z-index: 8;
+}
+
+#div_video {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+#enter_page {
+  // display: none;
+  position: absolute;
+  // opacity: 0.5;
+
+  width: 100%;
+  height:100%;
+  z-index: 99;
+}
+
+#enter_page img{
+  position: absolute;
+  width: 100%;
+}
+
+#top_wrap {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 80px;
+  top: 0px;
+  z-index: 88;
+  pointer-events:none;
+}
+
+#logo{
+  position: absolute;
+  width: 31.8%;
+  top:20%;
+  margin: auto;
+  left: 0px;
+  right: 0px;
+  pointer-events:none;
+}
+
+#menu {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100px;
+  bottom: 0px;
+  z-index: 88;
+}
+
+
+
+#btn_get {
+  position: absolute;
+  width: 19.4%;
+  left: 0px;
+  bottom: 0px;
+}
+
+#btn_ec {
+  position: absolute;
+  width: 19.6%;
+  right: 0px;
+  bottom: 0px;
+}
+
+#loading {
+  position: absolute;
+  text-align: center;
+  width: 300px;
+  height:200px;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  z-index: 999;
+}
+
+#loading span {
+  position: absolute;
+  width:30px;
+  height:20px;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: -20%;
+  margin: auto;
+
+  font-family:arial;color:#727578;font-size:16px;
+}
+
+#loading img {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 30%;
+  margin: auto;
+}
+
+.cont_wrap {
+  position: absolute;
+  overflow: hidden;
+  opacity: 0;
+  // display: none;
+  width: 100%;
+  height: 100%;
+  bottom: 0px;
+  z-index: 85;
+}
+
+
+
+.section {
+  width: 100%;
+  height:100%;
+}
+
+.cont_sc {
+  // display: none;
+
+  width: 100%;
+  height: 100%;
+}
+
+#btn_back {
+  position: absolute;
+  width: 58.8%;
+  right: 2%;
+  top: 1%;
+  z-index: 2;
+}
+
+#guide {
+  position: absolute;
+  pointer-events:none;
+  display: none;
+  width: 100%;
+  height: 150px;
+  bottom: 0px;
+  z-index: 89;
+}
+
+#g_black {
+  position: absolute;
+  width: 100%;
+  z-index: 2;
+}
+
+#g_slide {
+  position: absolute;
+  overflow: hidden;
+  width: 12%;
+  bottom: 40%;
+  margin: auto;
+  z-index: 3;
+  left: 0;
+  right: 0;
+}
+
+#g_swing {
+  position: absolute;
+  overflow: hidden;
+  width: 33.7%;
+  bottom: 40%;
+  margin: auto;
+  z-index: 3;
+  left: 0;
+  right: 0;
+}
+
+.circle {
+  transform-origin: 50% 50%;
+  opacity: 0;
+}

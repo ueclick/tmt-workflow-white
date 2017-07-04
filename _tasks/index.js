@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var config = require('rc')('tmtworkflow', {
-    projectName: process.cwd().split(path.sep).pop()
+    projectName: process.cwd().split(path.sep).pop(),
 });
 
 module.exports = function (gulp) {
