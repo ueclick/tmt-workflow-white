@@ -30,6 +30,14 @@
 
   "supportREM": false,   //REM转换
 
-  "reversion": false     //新文件名功能
+  "reversion": false,     //新文件名功能
+
+  "remConfig": {
+      "rootValue": 75,
+      "unitPrecision": 10,
+      "minPixelValue": 2
+    },
+
+    "tmod": true          // art-template 模板预编译
 }
 
