@@ -1,0 +1,1 @@
+var config={},assets_config={videoend:{type:"img",src:"img/video-end.jpg"},vod:{type:"mp4",src:"media/demo.mp4"}};
