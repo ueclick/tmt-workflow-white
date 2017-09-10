@@ -13,7 +13,7 @@
   "livereload": {
      "available": true,  //开启自动刷新
      "port": 8080,
-     "startPath": "html/TmTIndex.html"  //启动时自动打开的路径
+     "startPath": "TmTIndex.html"  //启动时自动打开的路径
    },
 
    //插件功能
@@ -38,6 +38,6 @@
       "minPixelValue": 2
     },
 
-    "tmod": true          // art-template 模板预编译
+    "tmod": false          // art-template 模板预编译
 }
 

@@ -18,12 +18,14 @@ var posthtmlPx2rem = require('posthtml-px2rem');  // HTML 内联 CSS 转换 `px`
 var paths = {
     src: {
         dir: './src',
-        img: './src/img/**/*.{JPG,jpg,png,gif}',
+        img: './src/img/**/*.{JPG,jpg,png,gif,svg}',
         slice: './src/slice/**/*.png',
         js: ['./src/js/**/*.js','./src/js/**/*.json'],
         media: './src/media/**/*',
         less: './src/css/style-*.less',
         lessAll: './src/css/**/*.less',
+        css: './src/css/**/*.css',
+        cssAll: './src/css/**/*.css',
         template: './src/template/**/*.html',
         html: ['./src/html/**/*.html', '!./src/html/_*/**.html', '!./src/html/_*/**/**.html'],
         htmlAll: './src/html/**/*.html',
@@ -72,6 +74,10 @@ module.exports = function (gulp, config) {
 
     function copyJs() {
         return copyHandler('js');
+    }
+
+    function copyCss() {
+        return copyHandler('css');
     }
 
     function copyMedia() {
@@ -153,7 +159,7 @@ module.exports = function (gulp, config) {
 
     //编译 html
     function compileHtml() {
-        // console.log(process.cwd() +'/dev');
+        // console.log(config.tmod);
         return gulp.src(paths.src.html)
             .pipe(gulpif(
                 config.tmod,
@@ -207,15 +213,15 @@ module.exports = function (gulp, config) {
     var watchHandler = function (type, file) {
         // console.log(file);
         // src/index.html
-        var sec_match = file.match(/^src[\/|\\](.*?)[\/|\\]/);
-        var root_match = file.match(/^src[\/|\\](.*)\.(html|htm)$/i);
+        var sec_match = file.match(/^src[\/|\\](.*?)[\/|\\]/);  // 匹配二级目录
+        var root_match = file.match(/^src[\/|\\](.*)\.(html|htm)$/i);  //匹配根目录html|htm
         // console.log(sec_match,root_match);
         var isRoot = sec_match?false:true;
         var target;
 
+        // console.log(sec_match); console.log(root_match);
         if(isRoot){
             target = root_match[2];
-            // console.log(target);
             switch (target) {
                 case 'html':
                     if (type === 'removed') {
@@ -280,6 +286,7 @@ module.exports = function (gulp, config) {
                         del([tmp]);
                     } else {
                         compileLess();
+                        copyHandler('css', file);
                     }
 
                     break;
@@ -301,6 +308,16 @@ module.exports = function (gulp, config) {
                     }
 
                     break;
+                case 'template':
+                    artTemplate();
+
+                    if (type === 'add') {
+                        setTimeout(function () {
+                            util.loadPlugin('BuildDev');
+                        }, 500);
+                    }
+
+                    break;
             }
         }
 
@@ -312,7 +329,9 @@ module.exports = function (gulp, config) {
         var watcher = gulp.watch([
                 paths.src.img,
                 paths.src.slice,
+                paths.src.template,
                 paths.src.js,
+                paths.src.css,
                 paths.src.media,
                 paths.src.lessAll,
                 paths.src.htmlAll,
@@ -351,6 +370,7 @@ module.exports = function (gulp, config) {
             copyImg,
             copySlice,
             copyJs,
+            copyCss,
             copyMedia,
             compileLess,
             supportTmod(),

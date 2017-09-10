@@ -12,7 +12,7 @@
 
 > 添加 art-template 预编译
 
-> build_dist 添加delTmpJS方法 ( main.js,libs.js,template.js)
+> build_dist 添加delTmpJS方法 (仅保留 main.js,libs.js,template.js)
 
 > 一个基于 [Gulp(v4.0)](https://github.com/gulpjs/gulp/tree/4.0)、高效、跨平台(Mac & Win)、可定制的前端工作流程。
 

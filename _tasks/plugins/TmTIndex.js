@@ -1,5 +1,7 @@
 /**
- * Created by littledu on 15/5/16.
+ * Created by littledu on 15/5/16.  
+ * Changed by white on 10/9/17
+ * add root html support
  */
 var fs = require('fs'),
     path = require('path'),
@@ -29,8 +31,8 @@ module.exports = function (config) {
             '       <tbody class="table-body">'
         ].join(''),
         tmpHtml = '',
-        length = '/dev/html/'.length,
-        collector = listdir('./dev/html');
+        length = '/dev/'.length,
+        collector = listdir('./dev');
 
 
     showdir(collector, 0);
@@ -49,11 +51,13 @@ module.exports = function (config) {
             var absolutePath = dir + '/' + file,
                 stats = fs.statSync(absolutePath);
 
-            var url = absolutePath.substring(absolutePath.indexOf('./dev/html/') + length + 1);
+
+            var url = absolutePath.substring(absolutePath.indexOf('./dev/') + length + 1);
 
             if (stats.isDirectory() && (stats.isDirectory() !== '.' || stats.isDirectory() !== '..')) {
                 collector['child'].push(listdir(absolutePath));
             } else {
+                // console.log(dir,file,url);
                 collector['child'].push({
                     'name': path.basename(absolutePath),
                     'type': 'file',
@@ -76,8 +80,11 @@ module.exports = function (config) {
         }
 
         if (collector['type'] == 'dir') {
+            // console.log(file,basename,level);
+            if( level==1 && basename!='html' )return;
+
             if (level != 0) {
-                html += '<tr><td class="td-dir" style="text-align:left; padding-left: ' + indent + 'px">[目录]: ' + basename + '</td><td></td></tr>';
+                html += '<tr><td class="td-dir" style="text-align:left; padding-left: ' + indent + 'px">|- ' + basename + '-| 目录</td><td></td></tr>';
             }
 
             collector['child'].forEach(function (item) {
@@ -101,7 +108,7 @@ module.exports = function (config) {
 
     html += '</tbody></table><div id="qrcode"></div><script src="http://wximg.gtimg.com/tmt/tools/file-list/js/jquery-2.1.3.min.js"></script><script src="http://wximg.gtimg.com/tmt/tools/file-list/js/qrcode.min.js"></script><script type="text/javascript">$(document).ready(function(){document.title= "' + config.projectName + ' 资源列表";  $(".level1").prependTo(".table-body"); $(".td-qrcode i").bind("mouseenter ",function(){$("#qrcode").show().empty();new QRCode(document.getElementById("qrcode"), encodeURI(window.location.href.split("TmTIndex.html")[0]+$(this).parent().parent().find("a").attr("href")));});$("body").bind("click",function(){$("#qrcode").hide();});});</script></body></html>';
 
-    var out = fs.createWriteStream('./dev/html/TmTIndex.html', {encoding: "utf8"});
+    var out = fs.createWriteStream('./dev/TmTIndex.html', {encoding: "utf8"});
     out.write(html, function (err) {
         if (err) console.log(err);
     });
