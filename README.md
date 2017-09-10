@@ -1,4 +1,4 @@
-# tmt-workflow | white修改版 [![Version Number](https://img.shields.io/badge/v-1.0.0-blue.svg?style=flat)](https://github.com/weixin/tmt-workflow/ "Version Number")
+# tmt-workflow | white修改版 [![Version Number](https://img.shields.io/badge/v-1.0.1-blue.svg?style=flat)](https://github.com/weixin/tmt-workflow/ "Version Number")
 
 [![Build Status](https://travis-ci.org/weixin/tmt-workflow.svg)](https://travis-ci.org/weixin/tmt-workflow "Build Status")
 [![Win Build status](https://img.shields.io/appveyor/ci/littledu/tmt-workflow.svg?label=Win%20build&style=flat)](https://ci.appveyor.com/project/littledu/tmt-workflow) 
@@ -8,11 +8,13 @@
 [![TmT Name](https://img.shields.io/badge/Team-TmT-brightgreen.svg?style=flat)](https://github.com/orgs/TmT/people "Tencent Moe Team") 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](http://opensource.org/licenses/MIT "Feel free to contribute.") 
 
-> 增加 rem config 
+> 增加 rem 配置
 
-> 添加 art-template 预编译
+> 添加 art-template 预编译配置
 
-> build_dist 添加delTmpJS方法 (仅保留 main.js,libs.js,template.js)
+> 添加 支持 根目录html文件解析
+
+> build_dist 添加delTmpJS方法,用于删除合并后临时文件 (仅保留 main.js,libs.js,template.js)
 
 > 一个基于 [Gulp(v4.0)](https://github.com/gulpjs/gulp/tree/4.0)、高效、跨平台(Mac & Win)、可定制的前端工作流程。
 
