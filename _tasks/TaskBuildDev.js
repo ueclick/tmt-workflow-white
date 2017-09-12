@@ -1,13 +1,14 @@
+var path = require('path');
 var del = require('del');
 var ejs = require('gulp-ejs');
 // var path = require('path');
-// var template  = require('gulp-art-include');
-var less = require('gulp-less');
+var less = require('gulp-less');  // less
+var sass = require('gulp-sass');  // sass
 var gulpif = require('gulp-if');
 var util = require('./lib/util');
 var ejshelper = require('tmt-ejs-helper');
-var tmodjs = require('gulp-tmod');
-var inject = require('gulp-inject');
+var tmodjs = require('gulp-tmod');          // art-template
+var inject = require('gulp-inject');        // 自动注入
 var bs = require('browser-sync').create();  // 自动刷新浏览器
 var lazyImageCSS = require('gulp-lazyimagecss');  // 自动为图片样式添加 宽/高/background-size 属性
 var postcss = require('gulp-postcss');   // CSS 预处理
@@ -26,6 +27,8 @@ var paths = {
         lessAll: './src/css/**/*.less',
         css: './src/css/**/*.css',
         cssAll: './src/css/**/*.css',
+        sass: './src/css/**/*.scss',
+        sassAll: './src/css/**/*.scss',
         template: './src/template/**/*.html',
         html: ['./src/html/**/*.html', '!./src/html/_*/**.html', '!./src/html/_*/**/**.html'],
         htmlAll: './src/html/**/*.html',
@@ -43,7 +46,7 @@ module.exports = function (gulp, config) {
 
     var lazyDir = config.lazyDir || ['../slice'];
     var remConfig = config.remConfig || {rootValue: 75,unitPrecision: 10, minPixelValue: 2};
-
+    // console.log(remConfig);
     // 复制操作
     var copyHandler = function (type, file) {
         file = file || paths['src'][type];
@@ -106,6 +109,18 @@ module.exports = function (gulp, config) {
             .on('end', reloadHandler)
     }
 
+    //编译 sass
+    function compileSass() {
+        return gulp.src(paths.src.sass)
+            .pipe(sass())
+            .on('error', sass.logError)
+            .pipe(lazyImageCSS({imagePath: lazyDir}))
+            .pipe(gulp.dest(paths.dev.css))
+            .on('data', function () {
+            })
+            .on('end', reloadHandler)
+    }
+
     // 判断是否执行 art-template 模板预编译 white++
     function supportTmod() {
         if (config['tmod']) {
@@ -140,7 +155,7 @@ module.exports = function (gulp, config) {
         return gulp.src(paths.src.index)
             .pipe(gulpif(
                 config.tmod,
-                inject(gulp.src('./js/template.js', {read: false,cwd: process.cwd() +'/dev'}), {addRootSlash: false,addPrefix:'.', name: 'template'}))  //,cwd: process.cwd() +'/dev'
+                injectTemplate())
             )
             .pipe(ejs(ejshelper()).on('error', function (error) {
                 console.log(error.message);
@@ -163,7 +178,7 @@ module.exports = function (gulp, config) {
         return gulp.src(paths.src.html)
             .pipe(gulpif(
                 config.tmod,
-                inject(gulp.src('./js/template.js', {read: false,cwd: process.cwd() +'/dev'}), {addRootSlash: false,addPrefix:'..', name: 'template'}))  //,cwd: process.cwd() +'/dev'
+                injectTemplate())
             )
             .pipe(ejs(ejshelper()).on('error', function (error) {
                 console.log(error.message);
@@ -178,6 +193,15 @@ module.exports = function (gulp, config) {
             .on('data', function () {
             })
             .on('end', reloadHandler)
+    }
+
+    function injectTemplate(){
+        return inject(gulp.src('./js/template.js', {read: false,cwd: process.cwd() +'/dev'}), {relative:true, name:'template', transform: function (filepath) {
+            arguments[0] = filepath.replace('../dev/', '');
+            // console.log(arguments);
+            // Use the default transform as fallback:
+            return inject.transform.apply(inject.transform, arguments);
+        }});
     }
 
     //启动 livereload
@@ -281,11 +305,16 @@ module.exports = function (gulp, config) {
                     break;
 
                 case 'css':
+                    var ext = path.extname(file);
                     if (type === 'removed') {
                         var tmp = file.replace('src/', 'dev/').replace('.less', '.css');
                         del([tmp]);
                     } else {
-                        compileLess();
+                        if(ext === '.less'){
+                            compileLess();
+                        }else if(ext === '.scss' || ext === '.sass'){
+                            compileSass();
+                        }
                         copyHandler('css', file);
                     }
 
@@ -334,6 +363,8 @@ module.exports = function (gulp, config) {
                 paths.src.css,
                 paths.src.media,
                 paths.src.lessAll,
+                paths.src.cssAll,
+                paths.src.sassAll,
                 paths.src.htmlAll,
                 paths.src.index
             ],
@@ -373,6 +404,7 @@ module.exports = function (gulp, config) {
             copyCss,
             copyMedia,
             compileLess,
+            compileSass,
             supportTmod(),
             compileHtml,
             compileRootHtml

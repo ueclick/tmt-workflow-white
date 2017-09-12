@@ -5,6 +5,7 @@ var path = require('path');
 var ejs = require('gulp-ejs');
 var gulpif = require('gulp-if');
 var less = require('gulp-less');
+var sass = require('gulp-sass');
 var util = require('./lib/util');
 var uglify = require('gulp-uglify');
 var usemin = require('gulp-usemin2');
@@ -14,8 +15,8 @@ var imagemin = require('gulp-imagemin');
 var pngquant = require('imagemin-pngquant');
 var tmtsprite = require('gulp-tmtsprite');   // 雪碧图合并
 var ejshelper = require('tmt-ejs-helper');
-var tmodjs = require('gulp-tmod');
-var inject = require('gulp-inject');         // art-template 预编译
+var tmodjs = require('gulp-tmod');           // art-template 预编译
+var inject = require('gulp-inject');         // 自动注入
 var postcss = require('gulp-postcss');  // CSS 预处理
 var postcssPxtorem = require('postcss-pxtorem'); // 转换 px 为 rem
 var postcssAutoprefixer = require('autoprefixer');
@@ -34,6 +35,8 @@ var paths = {
         media: './src/media/**/*',
         less: './src/css/style-*.less',
         lessAll: './src/css/**/*.less',
+        sass: './src/css/style-*.scss',
+        sassAll: './src/css/**/*.scss',
         template: './src/template/**/*.html',
         html: ['./src/html/**/*.html', '!./src/html/_*/**.html'],
         htmlAll: './src/html/**/*',
@@ -96,6 +99,16 @@ module.exports = function (gulp, config) {
     function compileLess() {
         return gulp.src(paths.src.less)
             .pipe(less())
+            .pipe(lazyImageCSS({imagePath: lazyDir}))
+            .pipe(tmtsprite({margin: 4}))
+            .pipe(gulpif('*.png', gulp.dest(paths.tmp.sprite), gulp.dest(paths.tmp.css)));
+    }
+
+    //编译 sass
+    function compileSass() {
+        return gulp.src(paths.src.sass)
+            .pipe(sass())
+            .on('error', sass.logError)
             .pipe(lazyImageCSS({imagePath: lazyDir}))
             .pipe(tmtsprite({margin: 4}))
             .pipe(gulpif('*.png', gulp.dest(paths.tmp.sprite), gulp.dest(paths.tmp.css)));
@@ -190,7 +203,7 @@ module.exports = function (gulp, config) {
         return gulp.src(paths.src.index)
             .pipe(gulpif(
                 config.tmod,
-                inject(gulp.src('./js/template.js', {read: false,cwd: process.cwd() +'/tmp'}), {addRootSlash: false,addPrefix:'.', name: 'template'}))  //,cwd: process.cwd() +'/dev'
+                injectTemplate())  //,cwd: process.cwd() +'/dev'
             )
             .pipe(ejs(ejshelper()).on('error', function (error) {
                 console.log(error.message);
@@ -216,7 +229,7 @@ module.exports = function (gulp, config) {
         return gulp.src(paths.src.html)
             .pipe(gulpif(
                 config.tmod,
-                inject(gulp.src('./js/template.js', {read: false,cwd: process.cwd() +'/tmp'}), {addRootSlash: false,addPrefix:'..', name: 'template'}))  //,cwd: process.cwd() +'/dev'
+                injectTemplate())  //,cwd: process.cwd() +'/dev'
             )
             .pipe(ejs(ejshelper()))
             .pipe(gulpif(
@@ -229,6 +242,15 @@ module.exports = function (gulp, config) {
                 jsmin: uglify()
             }))
             .pipe(gulp.dest(paths.tmp.html));
+    }
+
+    function injectTemplate(){
+        return inject(gulp.src('./js/template.js', {read: false,cwd: process.cwd() +'/tmp'}), {relative:true, name:'template', transform: function (filepath) {
+            arguments[0] = filepath.replace('../tmp/', '');
+            // console.log(arguments);
+            // Use the default transform as fallback:
+            return inject.transform.apply(inject.transform, arguments);
+        }});
     }
 
     //webp 编译
@@ -334,6 +356,7 @@ module.exports = function (gulp, config) {
     gulp.task('build_dist', gulp.series(
         delDist,
         compileLess,
+        compileSass,
         compileAutoprefixer,
         miniCSS,
         gulp.parallel(

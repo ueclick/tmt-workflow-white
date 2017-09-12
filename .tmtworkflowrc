@@ -33,7 +33,7 @@
   "reversion": false,     //新文件名功能
 
   "remConfig": {
-      "rootValue": 75,
+      "rootValue": 20,
       "unitPrecision": 10,
       "minPixelValue": 2
     },
