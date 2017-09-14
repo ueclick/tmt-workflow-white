@@ -151,7 +151,7 @@ module.exports = function (gulp, config) {
 
     //编译 根目录html
     function compileRootHtml() {
-        console.log(config);
+        // console.log(config);
         var tmod = config.tmod || false;
         // console.log(gulp.src('./dev/js/template.js'));
         return gulp.src(paths.src.index)
@@ -176,7 +176,7 @@ module.exports = function (gulp, config) {
 
     //编译 html
     function compileHtml() {
-        console.log(config.tmod);
+        // console.log(config.tmod);
         var tmod = config.tmod || false;
         return gulp.src(paths.src.html)
             .pipe(gulpif(
