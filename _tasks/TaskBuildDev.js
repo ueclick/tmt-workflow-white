@@ -151,10 +151,12 @@ module.exports = function (gulp, config) {
 
     //编译 根目录html
     function compileRootHtml() {
+        console.log(config);
+        var tmod = config.tmod || false;
         // console.log(gulp.src('./dev/js/template.js'));
         return gulp.src(paths.src.index)
             .pipe(gulpif(
-                config.tmod,
+                tmod,
                 supportInjectTemplate())
             )
             .pipe(ejs(ejshelper()).on('error', function (error) {
@@ -174,10 +176,11 @@ module.exports = function (gulp, config) {
 
     //编译 html
     function compileHtml() {
-        // console.log(config.tmod);
+        console.log(config.tmod);
+        var tmod = config.tmod || false;
         return gulp.src(paths.src.html)
             .pipe(gulpif(
-                config.tmod,
+                tmod,
                 supportInjectTemplate())
             )
             .pipe(ejs(ejshelper()).on('error', function (error) {
@@ -190,7 +193,8 @@ module.exports = function (gulp, config) {
                 ))
             )
             .pipe(gulp.dest(paths.dev.html))
-            .on('data', function () {
+            .on('data', function (chunk) {
+                // console.log(chunk.contents.toString().trim());
             })
             .on('end', reloadHandler)
     }

@@ -38,5 +38,7 @@
 
   "reversion": false,     //新文件名功能
 
-  "tmod": true          // art-template 模板预编译
+  "tmod": true,          // art-template 模板预编译
+
+  "inlineCSS": true
 }

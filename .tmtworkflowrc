@@ -38,6 +38,6 @@
       "minPixelValue": 2
     },
 
-    "tmod": false          // art-template 模板预编译
+   "tmod": false,          // art-template 模板预编译
 }
 
