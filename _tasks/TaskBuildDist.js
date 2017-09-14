@@ -203,7 +203,7 @@ module.exports = function (gulp, config) {
         return gulp.src(paths.src.index)
             .pipe(gulpif(
                 config.tmod,
-                injectTemplate())  //,cwd: process.cwd() +'/dev'
+                supportInjectTemplate())  //,cwd: process.cwd() +'/dev'
             )
             .pipe(ejs(ejshelper()).on('error', function (error) {
                 console.log(error.message);
@@ -229,7 +229,7 @@ module.exports = function (gulp, config) {
         return gulp.src(paths.src.html)
             .pipe(gulpif(
                 config.tmod,
-                injectTemplate())  //,cwd: process.cwd() +'/dev'
+                supportInjectTemplate())  //,cwd: process.cwd() +'/dev'
             )
             .pipe(ejs(ejshelper()))
             .pipe(gulpif(
@@ -242,6 +242,17 @@ module.exports = function (gulp, config) {
                 jsmin: uglify()
             }))
             .pipe(gulp.dest(paths.tmp.html));
+    }
+
+    // 判断是否插入template.js white++
+    function supportInjectTemplate() {
+        if (config['tmod']) {
+            return injectTemplate();
+        } else {
+            return function noTmod(cb) {
+                cb();
+            };
+        }
     }
 
     function injectTemplate(){
