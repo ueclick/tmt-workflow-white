@@ -1,11 +1,11 @@
 {
   //ftp 配置
   "ftp": {
-    "host": "xx.xx.xx.xx",
-    "port": "8021",
-    "user": "tmt",
-    "pass": "password",
-    "remotePath": "remotePath", //默认上传到根目录下，配置此属性可指定具体子目录
+    "host": "192.168.0.1",
+    "port": "",
+    "user": "root",
+    "pass": "pass",
+    "remotePath": "/data/wwwroot/display/labs", //默认上传到根目录下，配置此属性可指定具体子目录
     "includeHtml": true  //ftp 上传是否包含 html
   },
 
@@ -24,6 +24,13 @@
     "ftpAfter": ["ftp"]        //ftp 任务执行后自动执行
   },
 
+  "remConfig": {
+        "rootValue": 75,
+        "unitPrecision": 10,
+        "prop_white_list": [],
+        "minPixelValue": 2
+  },
+
   "lazyDir": ["../slice"], //gulp-lazyImageCSS 寻找目录(https://github.com/weixin/gulp-lazyimagecss)
 
   "supportWebp": false,  //编译使用 webp
@@ -32,12 +39,5 @@
 
   "reversion": false,     //新文件名功能
 
-  "remConfig": {
-      "rootValue": 20,
-      "unitPrecision": 10,
-      "minPixelValue": 2
-    },
-
-   "tmod": false,          // art-template 模板预编译
+  "tmod": false          // art-template 模板预编译
 }
-

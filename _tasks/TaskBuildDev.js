@@ -19,7 +19,7 @@ var posthtmlPx2rem = require('posthtml-px2rem');  // HTML 内联 CSS 转换 `px`
 var paths = {
     src: {
         dir: './src',
-        img: './src/img/**/*.{JPG,jpg,png,gif,svg}',
+        img: './src/img/**/*.{JPG,jpg,jpeg,png,gif,svg}',
         slice: './src/slice/**/*.png',
         js: ['./src/js/**/*.js','./src/js/**/*.json'],
         media: './src/media/**/*',
@@ -32,7 +32,8 @@ var paths = {
         template: './src/template/**/*.html',
         html: ['./src/html/**/*.html', '!./src/html/_*/**.html', '!./src/html/_*/**/**.html'],
         htmlAll: './src/html/**/*.html',
-        index: './src/*.html'
+        index: './src/*.html',
+        php: ['./src/*.php','./src/interface/*.php','./src/interface/**/*.php']
     },
     dev: {
         dir: './dev',
@@ -45,8 +46,9 @@ var paths = {
 module.exports = function (gulp, config) {
 
     var lazyDir = config.lazyDir || ['../slice'];
-    var remConfig = config.remConfig || {rootValue: 75,unitPrecision: 10, minPixelValue: 2};
+    var remConfig = config.remConfig || {rootValue: 75,unitPrecision: 10,prop_white_list:[], minPixelValue: 2};
     // console.log(remConfig);
+
     // 复制操作
     var copyHandler = function (type, file) {
         file = file || paths['src'][type];
@@ -87,6 +89,10 @@ module.exports = function (gulp, config) {
         return copyHandler('media');
     }
 
+    function copyPHP() {
+        return copyHandler('php');
+    }
+
     //复制操作 end
 
     //编译 less
@@ -113,10 +119,19 @@ module.exports = function (gulp, config) {
     function compileSass() {
         return gulp.src(paths.src.sass)
             .pipe(sass())
-            .on('error', sass.logError)
+            .on('error', function (error) {
+                console.log(error.message);
+            })
+            .pipe(gulpif(
+                config.supportREM,
+                postcss([
+                    postcssPxtorem(remConfig)
+                ])
+            ))
             .pipe(lazyImageCSS({imagePath: lazyDir}))
             .pipe(gulp.dest(paths.dev.css))
-            .on('data', function () {
+            .on('data', function (chunk) {
+                // console.log(chunk.contents.toString().trim());
             })
             .on('end', reloadHandler)
     }
@@ -126,6 +141,19 @@ module.exports = function (gulp, config) {
         if (config['tmod']) {
             return gulp.series(
                 artTemplate
+            );
+        } else {
+            return function noTmod(cb) {
+                cb();
+            };
+        }
+    }
+
+    // 判断是否执行 art-template 模板预编译 white++
+    function supportSass() {
+        if (true) {
+            return gulp.series(
+                compileSass
             );
         } else {
             return function noTmod(cb) {
@@ -362,6 +390,14 @@ module.exports = function (gulp, config) {
                     }
 
                     break;
+                case 'php':
+                    if (type === 'removed') {
+                        var tmp = file.replace('src/', 'dev/');
+                        del([tmp]);
+                    } else {
+                        copyHandler('php', file);
+                    }
+                    break;
             }
         }
 
@@ -381,7 +417,8 @@ module.exports = function (gulp, config) {
                 paths.src.cssAll,
                 paths.src.sassAll,
                 paths.src.htmlAll,
-                paths.src.index
+                paths.src.index,
+                paths.src.php
             ],
             {ignored: /[\/\\]\./}
         );
@@ -413,6 +450,7 @@ module.exports = function (gulp, config) {
     gulp.task('build_dev', gulp.series(
         delDev,
         gulp.series(
+            copyPHP,
             copyImg,
             copySlice,
             copyJs,

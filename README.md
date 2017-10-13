@@ -8,15 +8,20 @@
 [![TmT Name](https://img.shields.io/badge/Team-TmT-brightgreen.svg?style=flat)](https://github.com/orgs/TmT/people "Tencent Moe Team") 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat)](http://opensource.org/licenses/MIT "Feel free to contribute.") 
 
-> 增加 rem 配置
+> 增加 px to rem 配置
+
+> 增加 sass 支持
 
 > 添加 art-template 预编译配置
 
 > 添加 支持 根目录html文件解析
 
-> build_dist 添加delTmpJS方法,用于删除合并后临时文件 (仅保留 main.js,libs.js,template.js)
+> build_dist 添加delTmpJS方法,用于删除合并后临时文件 (仅保留 main.js,libs.js,template.js) 可以在 .tmtworkflowrc 配置
+
+> 可以配置 gulpfile.js 配置task 绝对路径（ 多项目共用一个task ）
 
 > 一个基于 [Gulp(v4.0)](https://github.com/gulpjs/gulp/tree/4.0)、高效、跨平台(Mac & Win)、可定制的前端工作流程。
+
 
 ## 功能特性
 

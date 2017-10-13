@@ -24,24 +24,19 @@
     "ftpAfter": ["ftp"]        //ftp 任务执行后自动执行
   },
 
+  "remConfig": {
+        "rootValue": 75,
+        "unitPrecision": 10,
+        "minPixelValue": 2
+  },
+
   "lazyDir": ["../slice"], //gulp-lazyImageCSS 寻找目录(https://github.com/weixin/gulp-lazyimagecss)
 
   "supportWebp": false,  //编译使用 webp
 
-  "supportREM": true,   //REM转换
-
-  "remConfig": {
-    "rootValue": 75,
-    "unitPrecision": 10,
-    "prop_white_list": [],
-    "minPixelValue": 2
-  },
+  "supportREM": false,   //REM转换
 
   "reversion": false,     //新文件名功能
 
-  "tmod": true,          // art-template 模板预编译
-
-  "inlineCSS": true,
-
-  "delTmpJS": ["./dist/js/**/*", "!./dist/js/template.js", "!./dist/js/main.js", "!./dist/js/libs.js", "!./dist/js/build/*.js", "!./dist/js/template.*.js", "!./dist/js/main.*.js", "!./dist/js/libs.*.js"]
+  "tmod": false          // art-template 模板预编译
 }

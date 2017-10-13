@@ -25,11 +25,12 @@ var posthtmlPx2rem = require('posthtml-px2rem');
 var RevAll = require('gulp-rev-all');   // reversion
 var revDel = require('gulp-rev-delete-original');
 var changed = require('./common/changed')();
+var obfuscate = require('gulp-obfuscate');
 
 var paths = {
     src: {
         dir: './src',
-        img: './src/img/**/*.{JPG,jpg,png,gif}',
+        img: './src/img/**/*.{JPG,jpg,jpeg,png,gif,svg}',
         slice: './src/slice/**/*.png',
         js: './src/js/**/*.js',
         media: './src/media/**/*',
@@ -40,8 +41,8 @@ var paths = {
         template: './src/template/**/*.html',
         html: ['./src/html/**/*.html', '!./src/html/_*/**.html'],
         htmlAll: './src/html/**/*',
-        php: './src/**/*.php',
-        index: './src/*.html'
+        index: './src/*.html',
+        php: ['./src/*.php','./src/interface/*.php','./src/interface/**/*.php']
     },
     tmp: {
         dir: './tmp',
@@ -65,7 +66,7 @@ module.exports = function (gulp, config) {
     var webp = require('./common/webp')(config);
 
     var lazyDir = config.lazyDir || ['../slice'];
-    var remConfig = config.remConfig || {rootValue: 75,unitPrecision: 10, minPixelValue: 2};
+    var remConfig = config.remConfig || {rootValue: 75,unitPrecision: 10, prop_white_list:[], minPixelValue: 2};
 
     var postcssOption = [];
 
@@ -92,7 +93,8 @@ module.exports = function (gulp, config) {
 
     // 清除 JS 合并产生后原始文件
     function delTmpJS(){
-        return del(['./dist/js/**/*', '!./dist/js/template.js', '!./dist/js/main.js', '!./dist/js/libs.js', '!./dist/js/template.*.js', '!./dist/js/main.*.js', '!./dist/js/libs.*.js'])
+        var delConf = config['delTmpJS'] || ['./dist/js/**/*', '!./dist/js/template.js', '!./dist/js/main.js', '!./dist/js/libs.js','!./dist/js/build/*.js', '!./dist/js/template.*.js', '!./dist/js/main.*.js', '!./dist/js/libs.*.js'];
+        return del(delConf)
     }
 
     //编译 less
@@ -152,10 +154,15 @@ module.exports = function (gulp, config) {
         return gulp.src(paths.src.index, {base: paths.src.dir}).pipe(gulp.dest(paths.dist.dir));
     }
 
+    function copyPHP() {
+        return gulp.src(paths.src.php, {base: paths.src.dir}).pipe(gulp.dest(paths.dist.dir));
+    }
+
     //JS 压缩
     function uglifyJs() {
         return gulp.src(paths.src.js, {base: paths.src.dir})
             .pipe(uglify())
+            // .pipe(obfuscate())
             .pipe(gulp.dest(paths.tmp.dir));
     }
 
@@ -374,6 +381,7 @@ module.exports = function (gulp, config) {
             imageminImg,
             imageminSprite,
             copyIndex,
+            copyPHP,
             copyMedia,
             uglifyJs
         ),
