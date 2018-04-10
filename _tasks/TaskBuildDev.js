@@ -19,7 +19,7 @@ var posthtmlPx2rem = require('posthtml-px2rem');  // HTML 内联 CSS 转换 `px`
 var paths = {
     src: {
         dir: './src',
-        img: './src/img/**/*.{JPG,jpg,jpeg,png,gif,svg}',
+        img: './src/img/**/*.{JPG,jpg,jpeg,png,gif,svg,json}',
         slice: './src/slice/**/*.png',
         js: ['./src/js/**/*.js','./src/js/**/*.json'],
         media: './src/media/**/*',

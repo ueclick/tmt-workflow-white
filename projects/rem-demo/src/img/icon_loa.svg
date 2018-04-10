@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="11px" height="15px" viewBox="0 0 11 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 46.1 (44463) - http://www.bohemiancoding.com/sketch -->
+    <title>Page 1</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="5.87854418e-16 14.9998134 5.87854418e-16 0 10.952 0 10.952 14.9998134"></polygon>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Desktop-HD-Copy-2" transform="translate(-125.000000, -704.000000)">
+            <g id="Page-1" transform="translate(125.000000, 704.000000)">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <g id="Clip-2"></g>
+                <path d="M5.4764,8.126 C4.0134,8.126 2.8264,6.939 2.8264,5.476 C2.8264,4.013 4.0134,2.827 5.4764,2.827 C6.9394,2.827 8.1254,4.013 8.1254,5.476 C8.1254,6.939 6.9394,8.126 5.4764,8.126 M5.4764,0 C2.4524,0 -0.0006,2.452 -0.0006,5.476 C-0.0006,8.501 5.4764,15.293 5.4764,14.99 C5.4764,14.99 10.9524,8.501 10.9524,5.476 C10.9524,2.452 8.5004,0 5.4764,0" id="Fill-1" fill="#FFFFFF" mask="url(#mask-2)"></path>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -7,17 +7,17 @@ var gulpif = require('gulp-if');
 var less = require('gulp-less');
 var sass = require('gulp-sass');
 var util = require('./lib/util');
+var useref = require('gulp-useref');
 var uglify = require('gulp-uglify');
-var usemin = require('gulp-usemin2');
 var lazyImageCSS = require('gulp-lazyimagecss');  // 自动为图片样式添加 宽/高/background-size 属性
 var minifyCSS = require('gulp-cssnano');
 var imagemin = require('gulp-imagemin');
 var pngquant = require('imagemin-pngquant');
-var tmtsprite = require('gulp-tmtsprite');   // 雪碧图合并
+// var tmtsprite = require('gulp-tmtsprite');   // 雪碧图合并  因为依赖库node-lwip 只能支持node6~
 var ejshelper = require('tmt-ejs-helper');
 var tmodjs = require('gulp-tmod');           // art-template 预编译
 var inject = require('gulp-inject');         // 自动注入
-var postcss = require('gulp-postcss');  // CSS 预处理
+var postcss = require('gulp-postcss');       // CSS 预处理
 var postcssPxtorem = require('postcss-pxtorem'); // 转换 px 为 rem
 var postcssAutoprefixer = require('autoprefixer');
 var posthtml = require('gulp-posthtml');
@@ -25,7 +25,8 @@ var posthtmlPx2rem = require('posthtml-px2rem');
 var RevAll = require('gulp-rev-all');   // reversion
 var revDel = require('gulp-rev-delete-original');
 var changed = require('./common/changed')();
-var obfuscate = require('gulp-obfuscate');
+var cache = require('gulp-cache');
+var size = require('gulp-size');
 
 var paths = {
     src: {
@@ -102,7 +103,7 @@ module.exports = function (gulp, config) {
         return gulp.src(paths.src.less)
             .pipe(less())
             .pipe(lazyImageCSS({imagePath: lazyDir}))
-            .pipe(tmtsprite({margin: 4}))
+            // .pipe(tmtsprite({margin: 4}))
             .pipe(gulpif('*.png', gulp.dest(paths.tmp.sprite), gulp.dest(paths.tmp.css)));
     }
 
@@ -112,7 +113,7 @@ module.exports = function (gulp, config) {
             .pipe(sass())
             .on('error', sass.logError)
             .pipe(lazyImageCSS({imagePath: lazyDir}))
-            .pipe(tmtsprite({margin: 4}))
+            // .pipe(tmtsprite({margin: 4}))
             .pipe(gulpif('*.png', gulp.dest(paths.tmp.sprite), gulp.dest(paths.tmp.css)));
     }
 
@@ -139,9 +140,11 @@ module.exports = function (gulp, config) {
     //图片压缩
     function imageminImg() {
         return gulp.src(paths.src.img)
-            .pipe(imagemin({
-                use: [pngquant()]
-            }))
+            .pipe(cache(imagemin({
+                use: [pngquant()],
+                verbose: true
+            })))
+            .pipe(size({title:'image'}))
             .pipe(gulp.dest(paths.tmp.img));
     }
 
@@ -169,9 +172,10 @@ module.exports = function (gulp, config) {
     //雪碧图压缩
     function imageminSprite() {
         return gulp.src('./tmp/sprite/**/*')
-            .pipe(imagemin({
-                use: [pngquant()]
-            }))
+            .pipe(cache(imagemin({
+                use: [pngquant()],
+                verbose: true
+            })))
             .pipe(gulp.dest(paths.tmp.sprite));
     }
 
@@ -221,9 +225,12 @@ module.exports = function (gulp, config) {
                     posthtmlPx2rem(remConfig)
                 ))
             )
-            .pipe(usemin({  //JS 合并压缩
-                jsmin: uglify()
-            }))
+            // .pipe(usemin({  //JS 合并压缩
+            //     jsmin: uglify()
+            // }))
+            .pipe(useref())
+            .pipe(gulpif('*.js', uglify()))
+
             .pipe(gulp.dest(paths.tmp.dir))
             .on('data', function () {
             })
@@ -245,9 +252,12 @@ module.exports = function (gulp, config) {
                     posthtmlPx2rem(remConfig)
                 ))
             )
-            .pipe(usemin({  //JS 合并压缩
-                jsmin: uglify()
-            }))
+            // .pipe(usemin({  //JS 合并压缩
+            //     jsmin: uglify()
+            // }))
+            .pipe(useref())
+            .pipe(gulpif('*.js', uglify()))
+
             .pipe(gulp.dest(paths.tmp.html));
     }
 
@@ -306,6 +316,7 @@ module.exports = function (gulp, config) {
         if (!config['supportChanged']) {
             return gulp.src('./tmp/**/*', {base: paths.tmp.dir})
                 .pipe(gulp.dest(paths.dist.dir))
+                .pipe(size())
                 .on('end', function () {
                     delTmp();
                     delTmpJS();
@@ -392,5 +403,13 @@ module.exports = function (gulp, config) {
         supportWebp(),
         findChanged,
         loadPlugin
+    ));
+
+    //注册 zip 任务
+    gulp.task('clean', gulp.series(
+        delDist,
+        function (done) {
+            return cache.clearAll(done);
+        }
     ));
 };
